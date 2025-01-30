@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillGenie</title>
+
+  <!-- styles -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="responsive.css">
+  <style>
+    
+    /* General Styles */
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(135deg, #87CEEB, #FFD700);
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .game-container {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 500px;
+    }
+
+    h1 {
+      color: #FF6F61;
+      font-size: 2.5em;
+      margin: 0;
+    }
+
+    #problem-display {
+      font-size: 2em;
+      margin: 20px 0;
+      color: #333;
+    }
+
+    #bubble-container {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      margin: 20px auto;
+      border: 3px dashed #FF6F61;
+      border-radius: 15px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.8);
+    }
+/* Add to your existing CSS */
+.hero-content2 {
+  padding: 20px;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.game-container {
+  margin: 20px;
+  transform: scale(0.9); /* Optional: if you need to fit in small screens */
+  z-index: 1;
+}
+
+.section-box {
+    margin-top: 170px;
+ /* Add this for proper containment */
+    height: auto;
+}
+    .bubble {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: #FF6F61;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5em;
+      color: white;
+      cursor: pointer;
+      animation: floatUp 5s linear;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease;
+    }
+
+    .bubble:hover {
+      transform: scale(1.1);
+    }
+
+    @keyframes floatUp {
+      from {
+        bottom: -60px;
+      }
+      to {
+        bottom: 100%;
+      }
+    }
+
+    #score {
+      font-size: 1.5em;
+      color: #333;
+      margin: 10px 0;
+    }
+
+    #progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #ddd;
+      border-radius: 5px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+
+    #progress {
+      height: 100%;
+      width: 0;
+      background: #FF6F61;
+      transition: width 0.5s ease;
+    }
+
+    #game-over-message {
+      font-size: 1.5em;
+      color: #FF6F61;
+      margin-top: 20px;
+    }
+
+    #start-button, #restart-button {
+      padding: 10px 20px;
+      font-size: 1.2em;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.3s ease;
+    }
+
+    #start-button:hover, #restart-button:hover {
+      background: #2980b9;
+    }
+
+    #restart-button {
+      display: none;
+      background: #FF6F61;
+    }
+
+    #restart-button:hover {
+      background: #e74c3c;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section id="hero">
+
+    <div class="section-box">
+      
+      <div class="content-wrap">
+        <header>
+          <a class="header-logo"><span id="skill">Skill </span>Genie</a>
+          <nav>
+            <a href="index.html" class="nav-items">Home</a>            <a href="aboutus.html" class="nav-items">About Us</a>
+            <a href="help.html" class="nav-items">Help</a>
+            <a href="login.html" class="nav-items">Log Out</a>
+          </nav>
+        </header>
+        <div class="hero-content2">
+            <div class="game-container">
+                <h1>Bubble Math Pop</h1>
+                <div id="problem-display"></div>
+                <div id="bubble-container"></div>
+                <div id="progress-bar">
+                  <div id="progress"></div>
+                </div>
+                <div id="score">Score: 0</div>
+                <button id="start-button">Start Game</button>
+                <button id="restart-button">Restart Game</button>
+                <p id="game-over-message"></p>
+              </div>
+            
+              <script>
+                const problemDisplay = document.getElementById("problem-display");
+                const bubbleContainer = document.getElementById("bubble-container");
+                const scoreDisplay = document.getElementById("score");
+                const progressBar = document.getElementById("progress");
+                const startButton = document.getElementById("start-button");
+                const restartButton = document.getElementById("restart-button");
+                const gameOverMessage = document.getElementById("game-over-message");
+            
+                let score = 0;
+                let gameInterval;
+                let bubbles = [];
+                let currentAnswer;
+            
+                // Generate a random math problem and answers
+                function generateMathProblem() {
+                  const num1 = Math.floor(Math.random() * 10) + 1;
+                  const num2 = Math.floor(Math.random() * 10) + 1;
+                  const operators = ["+", "-", "*"];
+                  const operator = operators[Math.floor(Math.random() * operators.length)];
+                  const problem = `${num1} ${operator} ${num2}`;
+                  const answer = eval(problem);
+                  const wrongAnswer1 = answer + Math.floor(Math.random() * 5) + 1;
+                  const wrongAnswer2 = answer - Math.floor(Math.random() * 5) + 1;
+                  const answers = [answer, wrongAnswer1, wrongAnswer2].sort(() => Math.random() - 0.5); // Shuffle answers
+                  return { problem, answer, answers };
+                }
+            
+                // Check if a new bubble overlaps with existing bubbles
+                function isOverlapping(newBubble, existingBubbles) {
+                  for (const bubble of existingBubbles) {
+                    const rect1 = newBubble.getBoundingClientRect();
+                    const rect2 = bubble.getBoundingClientRect();
+                    if (
+                      rect1.left < rect2.right &&
+                      rect1.right > rect2.left &&
+                      rect1.top < rect2.bottom &&
+                      rect1.bottom > rect2.top
+                    ) {
+                      return true; // Overlapping
+                    }
+                  }
+                  return false; // Not overlapping
+                }
+            
+                // Create a new bubble
+                function createBubble(answer) {
+                  const bubble = document.createElement("div");
+                  bubble.classList.add("bubble");
+                  bubble.textContent = answer;
+            
+                  let leftPosition;
+                  let overlapping;
+                  do {
+                    leftPosition = Math.random() * (bubbleContainer.offsetWidth - 60); // Random horizontal position
+                    bubble.style.left = `${leftPosition}px`;
+                    overlapping = isOverlapping(bubble, bubbles);
+                  } while (overlapping); // Keep trying until no overlap
+            
+                  bubbleContainer.appendChild(bubble);
+                  bubbles.push(bubble);
+            
+                  // Remove bubble when it reaches the top
+                  bubble.addEventListener("animationend", () => {
+                    bubble.remove();
+                    bubbles = bubbles.filter((b) => b !== bubble);
+                    if (bubbles.length === 0) endGame("Too many bubbles escaped! Game Over!");
+                  });
+            
+                  // Pop the bubble when clicked
+                  bubble.addEventListener("click", () => {
+                    if (parseInt(bubble.textContent) === currentAnswer) {
+                      bubble.remove();
+                      bubbles = bubbles.filter((b) => b !== bubble);
+                      score++;
+                      scoreDisplay.textContent = `Score: ${score}`;
+                      playPopSound();
+                      startRound();
+                    }
+                  });
+                }
+            
+                // Start a new round
+                function startRound() {
+                  const { problem, answer, answers } = generateMathProblem();
+                  problemDisplay.textContent = `Problem: ${problem}`;
+                  currentAnswer = answer;
+                  answers.forEach((ans) => createBubble(ans));
+                  progressBar.style.width = "0%";
+                  setTimeout(() => {
+                    progressBar.style.width = "100%";
+                  }, 10);
+                }
+            
+                // Play pop sound
+                function playPopSound() {
+                  const popSound = new Audio("https://www.soundjay.com/button/sounds/button-3.mp3");
+                  popSound.play();
+                }
+            
+                // End the game
+                function endGame(message) {
+                  clearInterval(gameInterval);
+                  gameOverMessage.textContent = message;
+                  restartButton.style.display = "block";
+                  startButton.style.display = "none";
+                }
+            
+                // Start the game
+                startButton.addEventListener("click", () => {
+                  score = 0;
+                  scoreDisplay.textContent = `Score: ${score}`;
+                  gameOverMessage.textContent = "";
+                  restartButton.style.display = "none";
+                  startButton.style.display = "none";
+                  bubbleContainer.innerHTML = "";
+                  startRound();
+                  gameInterval = setInterval(startRound, 5000); // Start a new round every 5 seconds
+                });
+            
+                // Restart the game
+                restartButton.addEventListener("click", () => {
+                  startButton.click();
+                });
+              </script>
+            
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- footer starts -->
+
+  <section id="footer">
+    <div class="section-box">
+      <div class="footer-grid">
+
+        <div>
+          <h3>Quick Links</h3>
+
+          <a href="home.html" class="footer-items f1">Home</a>
+          <a href="aboutus.html" class="footer-items f2">About us</a>
+          <a href="ai.html" class="footer-items f3">SmartTutor</a>
+          <a href="games.html" class="footer-items f4">Games</a>
+
+        </div>
+
+        <div>
+          <h3>Contacts</h3>
+
+          <a class="footer-items f1"></a>
+          <a class="footer-items f2">+(91) 62017 91910</a>
+          <a href="mailto:skillgenie@gmail.com" class="footer-items f3">skillgenie@gmail.com</a>
+          <a class="footer-items f4"></a>
+        </div>
+
+        <div>
+          <h3>Socials</h3>
+
+          <a href="https://www.github.com/ashrafamaan" class="footer-items f1">GitHub</a>
+          <a href="https://www.linkedin.com/in/amaanashraf/" class="footer-items f4">Linkedin</a>
+          <a class="footer-items f5">Twitter</a>
+        </div>
+
+      </div>
+
+      <p class="copyrights">© SkillGenie | all rights reserved</p>
+    </div>
+  </section>
+
+</body>
+
+</html>

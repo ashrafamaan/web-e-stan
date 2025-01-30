@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detective Math Mystery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Courier+Prime&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Cinzel', serif;
+      background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    h1 {
+      font-size: 3rem;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+    }
+    #story {
+      font-family: 'Courier Prime', monospace;
+      font-size: 1.5rem;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      margin-bottom: 20px;
+      border: 2px solid #ff5722;
+      box-shadow: 0 0 10px rgba(255, 87, 34, 0.5);
+    }
+    #answer {
+      padding: 10px;
+      font-size: 1.2rem;
+      width: 200px;
+      border: 2px solid #ff5722;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    #answer:focus {
+      border-color: #e64a19;
+      box-shadow: 0 0 10px rgba(255, 87, 34, 0.7);
+      outline: none;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      background: #ff5722;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    button:hover {
+      background: #e64a19;
+      transform: scale(1.1);
+    }
+    #result {
+      font-size: 1.5rem;
+      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border-radius: 5px;
+      border: 2px solid #4caf50;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    #result.visible {
+      opacity: 1;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      50% { transform: translateX(10px); }
+      75% { transform: translateX(-10px); }
+      100% { transform: translateX(0); }
+    }
+    .shake {
+      animation: shake 0.5s;
+    }
+    @keyframes celebrate {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .celebrate {
+      animation: celebrate 0.5s;
+    }
+    .particle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #ff0;
+      border-radius: 50%;
+      animation: particle 2s ease-out;
+    }
+    @keyframes particle {
+      0% { transform: translateY(0) rotate(0); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Detective Math Mystery</h1>
+  <p id="story">You find a locked door. To open it, solve the equation: 2x + 5 = 15. What is x?</p>
+  <input type="text" id="answer" placeholder="Enter your answer">
+  <button onclick="checkAnswer()">Submit</button>
+  <p id="result"></p>
+
+  <script>
+    const levels = [
+      { equation: "2x + 5 = 15", answer: 5, clue: "The treasure is in room 42." },
+      { equation: "3y - 7 = 8", answer: 5, clue: "Look for the painting with a red frame." },
+      { equation: "4z + 10 = 26", answer: 4, clue: "The key is hidden under the rug." },
+      { equation: "5a - 3 = 22", answer: 5, clue: "The final clue: The treasure is buried in the garden." }
+    ];
+
+    let currentLevel = 0;
+
+    function checkAnswer() {
+      const answerInput = document.getElementById("answer");
+      const result = document.getElementById("result");
+      const userAnswer = parseFloat(answerInput.value);
+      const correctAnswer = levels[currentLevel].answer;
+
+      if (userAnswer === correctAnswer) {
+        result.textContent = `✅ Correct! ${levels[currentLevel].clue}`;
+        result.classList.remove("shake");
+        result.classList.add("celebrate", "visible");
+        answerInput.value = "";
+
+        // Move to the next level
+        currentLevel++;
+        if (currentLevel < levels.length) {
+          document.getElementById("story").textContent = `You find another clue. Solve the equation: ${levels[currentLevel].equation}`;
+        } else {
+          result.textContent = "🎉 Congratulations! You solved the mystery and found the treasure!";
+          document.getElementById("story").textContent = "The mystery is over. You are a true detective!";
+          document.querySelector("button").disabled = true;
+          celebrate();
+        }
+      } else {
+        result.textContent = "❌ Incorrect. Try again!";
+        result.classList.remove("celebrate");
+        result.classList.add("shake", "visible");
+      }
+    }
+
+    function celebrate() {
+      for (let i = 0; i < 100; i++) {
+        const particle = document.createElement("div");
+        particle.className = "particle";
+        particle.style.left = `${Math.random() * 100}vw`;
+        particle.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        particle.style.animationDuration = `${Math.random() * 2 + 1}s`;
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 3000);
+      }
+    }
+  </script>
+</body>
+</html>

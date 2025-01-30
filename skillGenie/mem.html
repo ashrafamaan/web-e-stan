@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillGenie</title>
+
+  <!-- styles -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="responsive.css">
+  <style>
+    .hero-content2 {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #ffffff;
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+    }
+
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 120px);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      width: 120px;
+      height: 120px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front,
+    .card-back {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      backface-visibility: hidden;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-front {
+      background: #fff;
+      font-size: 24px;
+      color: #ffffff;
+    }
+
+    .card-back {
+      background: #007bff;
+      transform: rotateY(180deg);
+    }
+
+    .card-back img {
+      width: 80%;
+      height: 80%;
+      object-fit: contain;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    #timer {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      color: #555;
+      z-index: -1;
+    }
+    
+    @keyframes confetti {
+      0% {
+        transform: translateY(0) rotate(0);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #ff0;
+      animation: confetti 2s ease-out;
+    }
+
+    #restartButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      background: #ff5722;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    #restartButton:hover {
+      background: #e64a19;
+    }
+    .memory-grid{
+        z-index: 1;
+    }
+    #result,#timer{
+        z-index:1;
+    }
+  </style>
+</head>
+
+<body>
+
+  <section id="hero">
+
+    <div class="section-box">
+
+      <div class="content-wrap">
+        <header>
+          <a class="header-logo"><span id="skill">Skill </span>Genie</a>
+          <nav>
+            <a href="index.html" class="nav-items">Home</a>
+            <a href="aboutus.html" class="nav-items">About Us</a>
+            <a href="help.html" class="nav-items">Help</a>
+            <a href="login.html" class="nav-items">Log Out</a>
+          </nav>
+        </header>
+        <div class="hero-content2">
+          <h1>Memory Match Game</h1>
+          <div class="memory-grid" id="memoryGrid"></div>
+          <p id="result"></p>
+          <!-- <p id="timer">Time: 0s</p> -->
+          <button onclick="restartGame()" id="restartButton" style="display: none;">Restart Game</button>
+
+          <script>
+            const cards = [
+              { term: "HTML", image: "https://img.icons8.com/color/96/000000/html-5.png" },
+              { term: "CSS", image: "https://img.icons8.com/color/96/000000/css3.png" },
+              { term: "JavaScript", image: "https://img.icons8.com/color/96/000000/javascript.png" },
+              { term: "Python", image: "https://img.icons8.com/color/96/000000/python.png" }
+            ];
+
+            let flippedCards = [];
+            let matchedPairs = 0;
+            let startTime = Date.now();
+            let timerInterval;
+
+            function createGrid() {
+              const memoryGrid = document.getElementById("memoryGrid");
+              const allCards = [...cards.map(card => ({ ...card })), ...cards.map(card => ({ ...card }))].sort(() => Math.random() - 0.5);
+              allCards.forEach(card => {
+                const div = document.createElement("div");
+                div.className = "card";
+                div.innerHTML = `
+                  <div class="card-inner">
+                    <div class="card-front">?</div>
+                    <div class="card-back">
+                      <img src="${card.image}" alt="${card.term}" />
+                    </div>
+                  </div>
+                `;
+                div.addEventListener("click", flipCard);
+                memoryGrid.appendChild(div);
+              });
+            }
+
+            function flipCard(event) {
+              const card = event.currentTarget;
+              if (flippedCards.length < 2 && !card.classList.contains("flipped")) {
+                card.classList.add("flipped");
+                flippedCards.push(card);
+                if (flippedCards.length === 2) {
+                  checkMatch();
+                }
+              }
+            }
+
+            function checkMatch() {
+              const [card1, card2] = flippedCards;
+              const img1 = card1.querySelector("img").src;
+              const img2 = card2.querySelector("img").src;
+
+              if (img1 === img2) {
+                matchedPairs++;
+                if (matchedPairs === cards.length) {
+                  document.getElementById("result").textContent = "🎉 You win!";
+                  clearInterval(timerInterval);
+                  document.getElementById("restartButton").style.display = "block";
+                  celebrate();
+                }
+              } else {
+                setTimeout(() => {
+                  card1.classList.remove("flipped");
+                  card2.classList.remove("flipped");
+                }, 1000);
+              }
+              flippedCards = [];
+            }
+
+            function updateTimer() {
+              const timer = document.getElementById("timer");
+              const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+              timer.textContent = `Time: ${elapsedTime}s`;
+            }
+
+            function resetTimer() {
+              startTime = Date.now();
+              clearInterval(timerInterval);
+              timerInterval = setInterval(updateTimer, 1000);
+            }
+
+            function celebrate() {
+              for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement("div");
+                confetti.className = "confetti";
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.animationDuration = `${Math.random() * 2 + 1}s`;
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 3000);
+              }
+            }
+
+            function restartGame() {
+              const memoryGrid = document.getElementById("memoryGrid");
+              memoryGrid.innerHTML = "";
+              flippedCards = [];
+              matchedPairs = 0;
+              document.getElementById("result").textContent = "";
+              document.getElementById("restartButton").style.display = "none";
+              resetTimer();
+              createGrid();
+            }
+
+            // Start the timer
+            timerInterval = setInterval(updateTimer, 1000);
+
+            // Render the grid on page load
+            createGrid();
+          </script>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- footer starts -->
+  <section id="footer">
+    <div class="section-box">
+      <div class="footer-grid">
+        <div>
+          <h3>Quick Links</h3>
+          <a href="home.html" class="footer-items f1">Home</a>
+          <a href="aboutus.html" class="footer-items f2">About us</a>
+          <a href="ai.html" class="footer-items f3">SmartTutor</a>
+          <a href="games.html" class="footer-items f4">Games</a>
+        </div>
+        <div>
+          <h3>Contacts</h3>
+          <a class="footer-items f1"></a>
+          <a class="footer-items f2">+(91) 62017 91910</a>
+          <a href="mailto:skillgenie@gmail.com" class="footer-items f3">skillgenie@gmail.com</a>
+          <a class="footer-items f4"></a>
+        </div>
+        <div>
+          <h3>Socials</h3>
+          <a href="https://www.github.com/ashrafamaan" class="footer-items f1">GitHub</a>
+          <a href="https://www.linkedin.com/in/amaanashraf/" class="footer-items f4">Linkedin</a>
+          <a class="footer-items f5">Twitter</a>
+        </div>
+      </div>
+      <p class="copyrights">© SkillGenie | all rights reserved</p>
+    </div>
+  </section>
+</body>
+
+</html>

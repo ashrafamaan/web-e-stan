@@ -143,6 +143,15 @@ a{
   align-items: center;
   font-family:
 }
+
+.hero-content2 {
+  padding: 100px;
+  margin: 100px;
+  display:flex ;
+  flex-direction:row;
+  align-items: center;
+  font-family:
+}
 .hero-img {
   width: 27%;
   margin-top: -55px;
@@ -163,6 +172,28 @@ a{
   z-index: 2;
   cursor: pointer;
   transition: 0.3s;
+}
+.hero-btn2 {
+  font-size: 28px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+  border-radius: 50px;
+  height: 100px;
+  width: 450px;
+  margin-top: 200px;
+  z-index: 2;
+  cursor: pointer;
+  transition: 0.3s;
+  margin: 10px;
+}
+
+.hero-btn2:hover {
+  background-color: white;
+  color: black;
 }
 .hero-btn:hover {
   background-color: white;

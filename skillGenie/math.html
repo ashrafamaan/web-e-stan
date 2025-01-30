@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Sudoku</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .sudoku-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      text-align: center;
+      font-size: 20px;
+      border: 2px solid #333;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #fff;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+    .cell.correct {
+      background-color: #d4edda;
+      border-color: #28a745;
+    }
+    .cell.incorrect {
+      background-color: #f8d7da;
+      border-color: #dc3545;
+    }
+    .cell input {
+      width: 80%;
+      height: 80%;
+      text-align: center;
+      font-size: 18px;
+      border: none;
+      outline: none;
+      background: transparent;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    #timer {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Math Sudoku</h1>
+  <div class="sudoku-grid" id="sudokuGrid"></div>
+  <button onclick="checkSolution()">Check Solution</button>
+  <p id="result"></p>
+  <p id="timer">Time: 0s</p>
+
+  <script>
+    const gridSize = 3;
+    const grid = generateGrid(gridSize);
+    let startTime = Date.now();
+    let timerInterval;
+
+    function generateGrid(size) {
+      const operations = ['+', '-', '*', '/'];
+      const grid = [];
+      for (let i = 0; i < size; i++) {
+        const row = [];
+        for (let j = 0; j < size; j++) {
+          const num1 = Math.floor(Math.random() * 10) + 1;
+          const num2 = Math.floor(Math.random() * 10) + 1;
+          const operation = operations[Math.floor(Math.random() * operations.length)];
+          row.push(`${num1} ${operation} ${num2}`);
+        }
+        grid.push(row);
+      }
+      return grid;
+    }
+
+    function renderGrid() {
+      const sudokuGrid = document.getElementById("sudokuGrid");
+      sudokuGrid.innerHTML = "";
+      grid.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          const div = document.createElement("div");
+          div.className = "cell";
+          div.innerHTML = `<input type="text" data-row="${rowIndex}" data-col="${colIndex}" placeholder="${cell}" />`;
+          sudokuGrid.appendChild(div);
+        });
+      });
+    }
+
+    function checkSolution() {
+      let allCorrect = true;
+      grid.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          const input = document.querySelector(`input[data-row="${rowIndex}"][data-col="${colIndex}"]`);
+          const cellDiv = input.parentElement;
+          const userAnswer = parseFloat(input.value);
+          const correctAnswer = eval(cell);
+          if (userAnswer === correctAnswer) {
+            cellDiv.classList.add("correct");
+            cellDiv.classList.remove("incorrect");
+          } else {
+            cellDiv.classList.add("incorrect");
+            cellDiv.classList.remove("correct");
+            allCorrect = false;
+          }
+        });
+      });
+
+      const result = document.getElementById("result");
+      if (allCorrect) {
+        result.textContent = "🎉 Correct! Well done!";
+        clearInterval(timerInterval);
+      } else {
+        result.textContent = "❌ Incorrect. Keep trying!";
+      }
+    }
+
+    function updateTimer() {
+      const timer = document.getElementById("timer");
+      const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+      timer.textContent = `Time: ${elapsedTime}s`;
+    }
+
+    // Start the timer
+    timerInterval = setInterval(updateTimer, 1000);
+
+    // Render the grid on page load
+    renderGrid();
+  </script>
+</body>
+</html>
