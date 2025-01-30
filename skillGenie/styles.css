@@ -42,6 +42,10 @@ section {
   background: linear-gradient(transparent 60%, rgba(52, 13, 224, 0.556) ) ;
   z-index: 1;
 }
+#skill{
+  color: #d81cc8;
+  font-family: s;
+}
 .section-box {
   background-color: rgba(255, 255, 255, 0);
   backdrop-filter: blur(8px);
@@ -64,7 +68,7 @@ header {
 .header-logo {
   font-family: "s", sans-serif;
   font-size: 32px;
-  font-weight: 600;
+  font-weight: 50;
   letter-spacing: 1px;
   text-transform: ;
 }
@@ -94,7 +98,7 @@ img{
   justify-content: center;
 }
 nav .active {
-  color: #00FF26;
+  color: #e20f98;
 }
 
 a{
@@ -116,8 +120,8 @@ a{
   transform: scale(1);
 }
 .active:hover::after {
-  background-color: #00FF26;
-  box-shadow: 0 0 5px #00FF26;
+  background-color: #e20f98;
+  box-shadow: 0 0 5px #e20f98;
 }
 
 .hero-content h3 {
