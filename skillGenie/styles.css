@@ -39,7 +39,7 @@ section {
   bottom: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(transparent 60%, rgba(13, 199, 224, 0.556) ) ;
+  background: linear-gradient(transparent 60%, rgba(52, 13, 224, 0.556) ) ;
   z-index: 1;
 }
 .section-box {
@@ -69,7 +69,7 @@ header {
 }
 .header-logo span {
   color: #00FF26;
-  font-family: shootingstar;
+  font-family: shootin;
 }
 nav {
   display: flex;
