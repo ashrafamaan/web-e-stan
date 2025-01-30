@@ -61,6 +61,7 @@
     border: none;
     outline: none;
     background: transparent;
+
   }
   button {
     padding: 10px 20px;
@@ -71,6 +72,7 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+
   }
   button:hover {
     background-color: #0056b3;
@@ -84,7 +86,7 @@
     margin-top: 10px;
     font-size: 16px;
     color: #555;
-
+    z-index: 1;
   }</style>
 </head>
 
@@ -105,8 +107,8 @@
             <a href="login.html" class="nav-items">Log Out</a>
           </nav>
         </header>
-        <div class="hero-content2">
-            <h1>Math Sudoku</h1>
+            <div class="hero-content2">
+                <h1>Math Sudoku</h1>
             <div class="sudoku-grid" id="sudokuGrid"></div>
             <button onclick="checkSolution()">Check Solution</button>
             <p id="result"></p>
